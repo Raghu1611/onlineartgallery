@@ -1,0 +1,24 @@
+.image-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.image-table th, .image-table td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+  background-color: bisque;
+}
+
+.image-cell img {
+  width: 100%;
+  height: auto;
+  background-color: blue;
+}
+
+.info-cell {
+  text-align: left;
+}
+
+.info-cell p {
+  margin: 0;
+}
