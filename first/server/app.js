@@ -1,8 +1,9 @@
+
 const express = require('express');
 const cors = require('cors');
 const {MongoClient} = require('mongodb');
 const fileupload = require('express-fileupload');
-
+const nodemailer = require('nodemailer');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -10,7 +11,7 @@ app.use(fileupload());
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, console.log(`Server running on the port number ${PORT}`));
+app.listen(PORT, console.log('Server running on the port number ${PORT}'));
 
 //Configuration (MONGODB)
 var curl = "mongodb://localhost:27017";
@@ -42,6 +43,9 @@ app.post('/registration/signup', async function(req, res){
         res.json(err).status(404);
     }
 });
+ // Import the Login component
+
+
 
 //LOGIN MODULE
 app.post('/login/signin', async function(req, res){
@@ -151,9 +155,7 @@ app.post('/uploaddp', async function(req, res){
                 return res.json("File upload operation failed!");
 
             res.json("File uploaded successfully...");
-        });
-
-        conn = await client.connect();
+        });conn = await client.connect();
         db = conn.db('MSWD');
         users = db.collection('users');
         data = await users.updateOne({emailid: fname},{$set : {imgurl: fname + '.jpg'}});
@@ -163,7 +165,6 @@ app.post('/uploaddp', async function(req, res){
         res.json(err).status(404);
     }
 });
-
 app.post('/api/artworks', (req, res) => {
     const { title, artist, medium, price } = req.body;
     const newArtwork = new Artwork({ title, artist, medium, price });
@@ -172,35 +173,50 @@ app.post('/api/artworks', (req, res) => {
       .then(() => res.status(201).send('Artwork created successfully'))
       .catch(err => res.status(500).json({ error: err.message }));
   });
-  
-  
-  
-  
-// Login route
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-      const user = await User.findOne({ username });
-      if (user) {
-        // Assuming password is hashed and stored in the database
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (isPasswordValid) {
-          // Save user login information to MongoDB (if needed)
-          // Example: await user.save();
-          res.status(200).json({ message: 'Login successful' });
-        } else {
-          res.status(401).json({ message: 'Invalid password' });
-        }
-      } else {
-        res.status(401).json({ message: 'User not found' });
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  });
-  
+  //EMAIL NOTIFICATION
+app.post('/sendemail', async function(req, res){
+    try
+    {
+        var transport = nodemailer.createTransport({
+            service: "gmail",
+            host: "smtp.gmail.com",
+            port: 445,
+            secure: true,
+            auth:{user: "dheerajpothuru@gmail.com", pass: "lpyhodjjyjayjsde"}
+        });
 
-  
- 
- 
+        var emaildata = {
+            from: "dheerajpothuru@gmail.com",
+            to: "pothurudheeraj99@gmail.com",
+            subject: "Testing Email",
+            text: "This is a testing email message..."
+        };
+
+        transport.sendMail(emaildata, function(err, info){
+            if(err)
+                return res.json("Failed to sent Email");
+
+            res.json("Email sent successfully");
+        });
+    }catch(err)
+    {
+        res.json(err).status(404);
+    }
+});
+
+function authentication(req, res, next)
+{
+    var authHeader = req.headers.authorization;
+    if(!authHeader)
+        return res.json("Unauthorized access").status(401);
+
+    var auth = new Buffer.from(authHeader.split(' ')[1],'base64').toString().split(':');
+    var username = auth[0];
+    var password = auth[1];
+    if(username==='admin' && password==='123456')
+        next();
+    else
+        return res.json("Unauthorized access").status(401);
+}
+
+app.use(authentication);

@@ -70,6 +70,11 @@ export function loadModule(smid)
             module.src = "/myprofile";
             titlebar.innerText = "My Profile";
             break;
+            
+        case "M00102":
+                module.src = "/PaymentDetails";
+                titlebar.innerText = "paymentdetails";
+                break;    
         case "M10102":
             module.src = "/changepassword";
             titlebar.innerText = "Change Password";
@@ -79,18 +84,14 @@ export function loadModule(smid)
            titlebar.innerText = "NewArrivalNotification";
            break;
 
-        case "M00102":
+        case "M00104":
 
             module.src = "./FeedbackModule";
             titlebar.innerText = "FeedbackModule";
             break; 
+                
 
-        case " M00104":
-
-                module.src = "./ArtworkCard";
-                titlebar.innerText = "items";
-                break;       
-
+        
 
                   
         default:
@@ -109,7 +110,7 @@ class Home extends React.Component
         if(this.sid === "")
             window.location.replace("/");
 
-        var url = "http://localhost:5000/home/uname";
+        var url = " ";
         var data = JSON.stringify({
             emailid : this.sid
         });

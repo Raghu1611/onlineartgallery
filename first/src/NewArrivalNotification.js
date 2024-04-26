@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import './NewArrivalNotification.css';
 
 import myImage from './monalisa.png';
@@ -9,34 +10,35 @@ import myImage3 from './family.png';
 function Newarrivalnotification() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [images, setImages] = useState([
-    { src: myImage, alt: "Monalisa", artist: "Leonardo da Vinci", date: "1503 to 1519", where: "Louvre Museum (Paris)", time: new Date() },
-    { src: myImage1, alt: "Goernica", artist: "Pablo Picasso", date: "1937", where: "Museo Reina Sofía (Madrid)", time: new Date() },
-    { src: myImage2, alt: "Digego", artist: "Diego Velázquez", date: "1656", where: "Museo del Prado (Madrid)", time: new Date() },
-    { src: myImage3, alt: "Family", artist: "Vincent van Gogh", date: "1889", where: "Museum of Modern Art (New York City)", time: new Date() }
+    { src: myImage, alt: "Monalisa", artist: "Leonardo da Vinci", date: "1503 to 1519", where: "Louvre Museum (Paris)", time: new Date(), price: 25 },
+    { src: myImage1, alt: "Goernica", artist: "Pablo Picasso", date: "1937", where: "Museo Reina Sofía (Madrid)", time: new Date(), price: 30 },
+    { src: myImage2, alt: "Digego", artist: "Diego Velázquez", date: "1656", where: "Museo del Prado (Madrid)", time: new Date(), price: 20 },
+    { src: myImage3, alt: "Family", artist: "Vincent van Gogh", date: "1889", where: "Museum of Modern Art (New York City)", time: new Date(), price: 15 }
   ]);
   const [deletedImages, setDeletedImages] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [totalBill, setTotalBill] = useState(0);
+  const [editIndex, setEditIndex] = useState(-1);
+  const [editedArtist, setEditedArtist] = useState("");
+  const [editedDate, setEditedDate] = useState("");
+  const [editedWhere, setEditedWhere] = useState("");
+  const [editedPrice, setEditedPrice] = useState(0);
+  const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [name, setName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
 
   const handleUpload = () => {
-    // Check if a file is selected
     if (selectedFile) {
-      console.log("Uploading file:", selectedFile);
-
-      // Here you can perform further actions, such as uploading to a server
-      // For demonstration purposes, let's add the uploaded image to the list
       const reader = new FileReader();
       reader.onload = function(event) {
         const uploadedImage = event.target.result;
-        console.log("Uploaded image:", uploadedImage);
-        // You can update your UI with the uploaded image here
         setImages([...images, { src: uploadedImage, alt: "Uploaded Image", time: new Date() }]);
       };
       reader.readAsDataURL(selectedFile);
-
-      // Reset the selected file state
       setSelectedFile(null);
     } else {
       console.log("Please select a file.");
@@ -44,61 +46,151 @@ function Newarrivalnotification() {
   };
 
   const handleDelete = (index) => {
-    // Move the deleted image to the deletedImages array
     const deletedImage = images[index];
     setDeletedImages([...deletedImages, deletedImage]);
 
-    // Remove the image at the specified index from the images array
     const updatedImages = [...images];
     updatedImages.splice(index, 1);
     setImages(updatedImages);
   };
 
   const handleEdit = (index) => {
-    // Add your edit logic here
-    console.log("Edit image at index:", index);
+    setEditIndex(index);
+    const image = images[index];
+    setEditedArtist(image.artist);
+    setEditedDate(image.date);
+    setEditedWhere(image.where);
+    setEditedPrice(image.price);
   };
 
-  const handleRetrieve = () => {
-    // Retrieve the last deleted image
-    const lastDeletedImage = deletedImages.pop();
-    if (lastDeletedImage) {
-      setImages([...images, lastDeletedImage]);
-    } else {
-      console.log("No deleted images to retrieve.");
-    }
-    setDeletedImages([...deletedImages]);
+  const handleSaveEdit = () => {
+    const updatedImages = [...images];
+    updatedImages[editIndex] = {
+      ...updatedImages[editIndex],
+      artist: editedArtist,
+      date: editedDate,
+      where: editedWhere,
+      price: editedPrice
+    };
+    setImages(updatedImages);
+    setEditIndex(-1);
   };
+
+  const handleCancelEdit = () => {
+    setEditIndex(-1);
+  };
+
+  const handleAddToCart = (index) => {
+    const selectedImage = images[index];
+    const existingItem = cartItems.find((item) => item.alt === selectedImage.alt);
+
+    if (existingItem) {
+      setCartItems(
+        cartItems.map((item) =>
+          item.alt === selectedImage.alt
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      setCartItems([...cartItems, { ...selectedImage, quantity: 1 }]);
+    }
+    
+    const updatedTotalBill = totalBill + selectedImage.price;
+    setTotalBill(updatedTotalBill);
+  };
+
+  const handleRemoveFromCart = (index) => {
+    const selectedItem = cartItems[index];
+    const updatedCartItems = [...cartItems];
+
+    if (selectedItem.quantity > 1) {
+      updatedCartItems[index] = { ...selectedItem, quantity: selectedItem.quantity - 1 };
+    } else {
+      updatedCartItems.splice(index, 1);
+    }
+
+    setCartItems(updatedCartItems);
+
+    const updatedTotalBill = totalBill - selectedItem.price;
+    setTotalBill(updatedTotalBill);
+  };
+
+  const generateBill = () => {
+    console.log("Generating bill...");
+    console.log("Total Bill:", totalBill);
+    setOrderConfirmed(true);
+  };
+
+  const filteredImages = images.filter(image =>
+    image.artist.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
-      <h1>Art Images</h1>
+      <div className="navbar">
+        <h1>Art Images</h1>
+        <input
+          type="text"
+          placeholder="Search Artist..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <table className="image-table">
         <thead>
           <tr>
             <th>Image</th>
-            <th>Artist</th>
-            <th>Date</th>
-            <th>Where to See</th>
-            <th>Time</th>
-            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {images.map((image, index) => (
-            <tr key={index}>
-              <td className="image-cell"><img src={image.src} width='200px' alt={image.alt} /></td>
-              <td className="info-cell">{image.artist}</td>
-              <td className="info-cell">{image.date}</td>
-              <td className="info-cell">{image.where}</td>
-              <td className="info-cell">{image.time.toLocaleString()}</td>
-              <td className="info-cell">{(new Date() - image.time) < (24 * 3600 * 1000) ? 'New' : 'Old'}</td>
-              <td className="info-cell">
-                <button onClick={() => handleDelete(index)}>Delete</button>
-                <button onClick={() => handleEdit(index)}>Edit</button>
-              </td>
-            </tr>
+          {filteredImages.map((image, index) => (
+            <React.Fragment key={index}>
+              <tr>
+                <td className="image-cell"><img src={image.src} width='100px' alt={image.alt} /></td>
+                <td className="info-cell">
+                  {editIndex === index ? (
+                    <div>
+                      <input type="text" value={editedArtist} onChange={(e) => setEditedArtist(e.target.value)} />
+                      <input type="text" value={editedDate} onChange={(e) => setEditedDate(e.target.value)} />
+                      <input type="text" value={editedWhere} onChange={(e) => setEditedWhere(e.target.value)} />
+                      <input type="number" value={editedPrice} onChange={(e) => setEditedPrice(e.target.value)} />
+                      <button onClick={handleSaveEdit}>Save</button>
+                      <button onClick={handleCancelEdit}>Cancel</button>
+                    </div>
+                  ) : (
+                    <React.Fragment>
+                      <button onClick={() => handleDelete(index)}>Delete</button>
+                      <button onClick={() => handleEdit(index)}>Edit</button>
+                      <button onClick={() => handleAddToCart(index)}>Add to Cart</button>
+                    </React.Fragment>
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="info-cell" colSpan="2">
+                  <div>
+                    <strong>Artist:</strong> {image.artist}
+                  </div>
+                  <div>
+                    <strong>Date:</strong> {image.date}
+                  </div>
+                  <div>
+                    <strong>Where to See:</strong> {image.where}
+                  </div>
+                  <div>
+                    <strong>Time:</strong> {image.time.toLocaleString()}
+                  </div>
+                  <div>
+                    <strong>Status:</strong> {(new Date() - image.time) < (24 * 3600 * 1000) ? 'New' : 'Old'}
+                  </div>
+                  <div>
+                    <strong>Price:</strong> ${image.price}
+                  </div>
+                </td>
+              </tr>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -109,12 +201,40 @@ function Newarrivalnotification() {
       </div>
       <div>
         <h2>Deleted Images</h2>
-        <button onClick={handleRetrieve}>Retrieve Last Deleted Image</button>
         <ul>
           {deletedImages.map((image, index) => (
             <li key={index}>{image.alt}</li>
           ))}
         </ul>
+      </div>
+      <div>
+        <h2>Shopping Cart</h2>
+        <ul>
+          {cartItems.map((item, index) => (
+            <li key={index}>
+              {item.alt} - ${item.price} - Quantity: {item.quantity}
+              <button onClick={() => handleRemoveFromCart(index)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+
+        <div className="total-bill-box">
+          <h4>Total Bill</h4>
+          <ul>
+            {cartItems.map((item) => (
+              <li key={item.alt}>
+                {item.alt} - ${item.quantity * item.price}
+              </li>
+            ))}
+            <li className="total-bill-amount">
+              Total: ${totalBill}
+            </li>
+          </ul>
+        </div>
+
+        <Link to="/paymentDetails" target="_blank">
+          <button onClick={generateBill}>pay now</button>
+        </Link>
       </div>
     </div>
   );

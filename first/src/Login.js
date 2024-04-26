@@ -197,8 +197,12 @@ function Login(){
     }
 
     return(
+  
         <div className='full-height'>
+  
+            
             <div id='header' className='loginheader'>ART GALLERYY
+            
             </div>
             <div id='content' className='logincontent'>
                 <div id='login' className='popup'>
@@ -263,6 +267,7 @@ function Login(){
                           <div><input type='password' id='FT3' className='txtbox' /></div>
                           <div style={space}></div>
                           <div><button className='btn' onClick={forgotPass}>Reset</button></div>
+                          <div>New user? <label className='linklabel' onClick={forgotPass}>forgot</label></div>
                       </div>
                   </div>
               </div>

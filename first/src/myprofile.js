@@ -29,7 +29,7 @@ export function loadInfo(res)
     L2.innerText = data[0].lastname;
     L3.innerText = data[0].contactno;
     L4.innerText = data[0].emailid;
-    IM1.src = require('./img.png' + data[0].imgurl);
+    IM1.src = require('./picaso.png' + data[0].imgurl);
 }
 
 export function uploadPhoto(){

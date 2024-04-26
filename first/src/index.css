@@ -31,6 +31,8 @@ html, body{
   background-size: 100% 100%;
 }
 
+
+
 .loginfooter{
   background: rgb(220, 166, 2);
   height: 30px;
@@ -91,3 +93,4 @@ html, body{
   color: dodgerblue;
   cursor: pointer;
 }
+

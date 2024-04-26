@@ -8,8 +8,11 @@ import ChangePassword from './changepassword';
 import AxiosDemo from './axiosdemo';
 import MyProfile from './myprofile';
 import NewArrivalNotification from './NewArrivalNotification';
-import FeedbackModule from './FeedbackModule';
-import ArtworkCard from './Artworkard';
+import FeedbackModule from './FeedbackModule.';
+import PaymentDetails from './PaymentDetails';
+
+
+
 
 
 function Website() {
@@ -22,8 +25,9 @@ function Website() {
         <Route path="/axiosdemo" element={<AxiosDemo />} />
         <Route path="/myprofile" element={<MyProfile />} />
         <Route path="/NewArrivalNotification" element={<NewArrivalNotification />} />
-        <Route path="/FeedbackModule" element={<FeedbackModule />} />
-        <Route path="/ArtworkCard" element={<ArtworkCard />} />
+        <Route path="/FeedbackModule" element={<FeedbackModule/>} />
+        
+        <Route path="/PaymentDetails" element={<PaymentDetails />} />
       </Routes>
     </BrowserRouter>
   );
