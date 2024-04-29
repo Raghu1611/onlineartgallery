@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import logo from './logo.jpg';
 import { callApi, errorResponse, setSession } from './main';
 
+
 const popupwindowstyle = { width: '300px', height: '300px', background: 'white' };
 const logostyle = { width: '75px', height: '75px', position: 'absolute', left: '115px', top: '10px' };
 const logodivstyle = { height: '100px' };

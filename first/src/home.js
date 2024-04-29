@@ -4,6 +4,7 @@ import logouticon from './logout.jpg'
 import { callApi, errorResponse, getSession, setSession } from './main';
 import menuicon from './menulogo.jpg'
 
+
 const HS1 = {"padding-left" : "5px", "font-weight" : "bold"};
 const HS2 = {"float" : "right", "padding-right" : "5px", "cursor" : "pointer"};
 const HS3 = {"float" : "right", "height" : "16px", "margin-top" : "6px", "cursor" : "pointer"}
